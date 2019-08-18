@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">whack-a-jellyfish</string>
+    <string name="player_name">Player</string>
+</resources>

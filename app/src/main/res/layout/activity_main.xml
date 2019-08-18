@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_main"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.20">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50sp"
+        android:src="@drawable/logo" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:paddingLeft="30sp"
+        android:paddingRight="30sp">
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:text="Name:"
+            android:textColor="#f16329"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+        <!--android:layout_toLeftOf="@+id/name_input_text"-->
+        <!--android:layout_marginLeft="50sp"-->
+
+
+        <EditText
+            android:id="@+id/name_input_text"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/text_view"
+            android:layout_marginLeft="20sp"
+            android:hint="@string/player_name"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/big_jellyfish"
+            android:layout_width="80sp"
+            android:layout_height="80sp"
+            android:layout_below="@id/text_view"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30sp"
+            android:src="@drawable/gold_jellyfish" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3">
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="100sp"
+            android:layout_height="100sp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/play"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
