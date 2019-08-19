@@ -1,12 +1,11 @@
 package whack.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +23,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
-                intent.putExtra(NAME_EXTRA, playerName.getText().toString());
+                String name = playerName.getText().toString();
+                if(name.isEmpty())
+                    name = "Player";
+                intent.putExtra(NAME_EXTRA, name);
                 startActivity(intent);
             }
         });

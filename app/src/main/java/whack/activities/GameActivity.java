@@ -6,58 +6,158 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class GameActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.Random;
+
+import whack.ui.JellyfishButton;
+
+public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final int ROWS = 3;
     private final int COLS = 3;
-    private DisplayMetrics _metrics;
-    private CountDownTimer countDownTimer;
+    private final int MAX_MISS = 3;
+    private final String NAME_EXTRA = "name";
+    private final String GAME_RESULT = "result";
+    private final String WIN = "win";
+    private final String LOSE = "lose";
     private boolean timerRunning = false;
     private long timeLeftInMillis = 30000;
     private long interval = 1000;
+    private int score = 0;
+    private int miss = 0;
+
+    private DisplayMetrics _metrics;
+    private CountDownTimer countDownTimer;
+    private Handler handler;
+    private Runnable jellyfishVisibilityRunnable;
+    private ArrayList<JellyfishButton> jellyfishImageButtons;
+    private ArrayList<ImageView> missSigns;
+
+    private GridLayout missSignsGrid;
+    private ProgressBar progressBar;
     private TextView timerText;
+    private TextView scoreTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        handler = new Handler();
+        progressBar = findViewById(R.id.progress);
+        scoreTextView = findViewById(R.id.score);
+
         designGridLayout();
+        createRunnableForJellyfish();
+        initializeMissSigns();
         updateTimer();
-        manageTime();
+        updateScore();
+        manageTime(LOSE);
+    }
+
+    private void initializeMissSigns() {
+        missSigns = new ArrayList<>();
+        for(int i = 0; i < MAX_MISS; i++) {
+            int res = getResources().getIdentifier("miss_" + (i+1), "id", getPackageName());
+            ImageView imageView = findViewById(res);
+            missSigns.add(imageView);
+        }
+    }
+
+    private void createRunnableForJellyfish() {
+        jellyfishVisibilityRunnable = new Runnable() {
+            @Override
+            public void run() {
+                //random number of jellyfish to show
+                Random changeRandom = new Random();
+                int numOfButtonsToChange = changeRandom.nextInt(4);
+                for(int i = 0; i < numOfButtonsToChange+1; i++) {
+                    int index = changeRandom.nextInt(ROWS*COLS);
+                    JellyfishButton btn = (JellyfishButton) jellyfishImageButtons.get(index);
+                    btn.setNextRoundChange(1);
+                }
+
+                //show selected jellyfish
+                for(JellyfishButton btn : jellyfishImageButtons) {
+                    if(btn.getNextRoundChange() == 1) {
+                        btn.setNextRoundChange(0);
+                        btn.setVisibility(View.VISIBLE);
+                    } else {
+                        btn.setVisibility(View.INVISIBLE);
+                    }
+                }
+                handler.postDelayed(jellyfishVisibilityRunnable, 2000);
+            }
+        };
+        jellyfishVisibilityRunnable.run();
     }
 
     private void designGridLayout() {
+        jellyfishImageButtons = new ArrayList<>();
+
         RelativeLayout gameLayout = findViewById(R.id.game_layout);
         GridLayout gridLayout = createGridLayout(COLS, ROWS);
+        gameLayout.setOnClickListener(this);
 
         gameLayout.addView(gridLayout);
 
         for(int i = 0 ; i < COLS * ROWS ; i++) {
             int fraction = COLS;
-            int screenHeight = screenHeightPixels();
+//            int screenHeight = screenHeightPixels();
             int screenWidth = screenWidthPixels();
-            int ImageWidth = screenWidth / fraction;
+            int imageWidth = screenWidth / fraction;
 
-            ImageView imageView = new ImageView(this);
-            imageView.setBackground(getDrawable(R.drawable.vortex));
+            RelativeLayout relativeLayout = new RelativeLayout(this);
+            createVortexImage(relativeLayout, gridLayout, imageWidth);
+            createJellyfishImageButton(relativeLayout, gridLayout, imageWidth);
 
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-
-            params.width = ImageWidth;
-            params.height = ImageWidth;
-            imageView.setLayoutParams(params);
-            gridLayout.addView(imageView);
+            gridLayout.addView(relativeLayout);
         }
+    }
+
+    private void createVortexImage(RelativeLayout relativeLayout, GridLayout gridLayout, int imageWidth) {
+        RelativeLayout.LayoutParams relParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        relParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        ImageView imageView = new ImageView(this);
+        imageView.setBackground(getDrawable(R.drawable.vortex));
+
+        relParams.width = imageWidth;
+        relParams.height = imageWidth;
+        imageView.setLayoutParams(relParams);
+        relativeLayout.addView(imageView);
+    }
+
+    private void createJellyfishImageButton(RelativeLayout relativeLayout, GridLayout gridLayout, int imageWidth) {
+        RelativeLayout.LayoutParams relParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        relParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        JellyfishButton jellyfishButton = new JellyfishButton(this);
+        jellyfishButton.setBackground(getDrawable(R.drawable.gold_jellyfish));
+        jellyfishButton.setVisibility(View.INVISIBLE);
+
+        relParams.width = imageWidth - 200;
+        relParams.height = imageWidth - 200;
+
+        jellyfishButton.setLayoutParams(relParams);
+        relativeLayout.addView(jellyfishButton);
+
+        jellyfishImageButtons.add(jellyfishButton);
+        jellyfishButton.setOnClickListener(this);
     }
 
     private GridLayout createGridLayout(int cols, int rows) {
@@ -70,7 +170,6 @@ public class GameActivity extends AppCompatActivity {
         gridLayout.setColumnCount(cols);
         gridLayout.setRowCount(rows);
 
-
         return gridLayout;
     }
 
@@ -78,9 +177,9 @@ public class GameActivity extends AppCompatActivity {
         return getMetrics().widthPixels;
     }
 
-    public int screenHeightPixels() {
-        return getMetrics().heightPixels;
-    }
+//    public int screenHeightPixels() {
+//        return getMetrics().heightPixels;
+//    }
 
     private DisplayMetrics getMetrics() {
         if (_metrics == null) {
@@ -89,42 +188,45 @@ public class GameActivity extends AppCompatActivity {
             _metrics = new DisplayMetrics();
             display.getMetrics(_metrics);
         }
-
         return _metrics;
     }
 
-    private void manageTime() {
+    private void manageTime(String gameResult) {
         if(timerRunning) {
-            stopTimer();
+            stopTimer(gameResult);
         } else {
-            Log.d("tair", "manageTime: timer is not running");
             startTimer();
         }
     }
 
-    private void stopTimer() {
+    private void stopTimer(String gameResult) {
         countDownTimer.cancel();
         timerRunning = false;
+        moveToNextActivity(gameResult);
     }
 
     private void startTimer() {
-        Log.d("tair", "startTimer: ");
         countDownTimer = new CountDownTimer(timeLeftInMillis, interval) {
             @Override
             public void onTick(long l) {
                 timeLeftInMillis = l;
-                Log.d("tair", "onTick: time left " + timeLeftInMillis);
                 updateTimer();
             }
 
             @Override
             public void onFinish() {
-                Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
-                startActivity(intent);
+                moveToNextActivity(WIN);
             }
         }.start();
 
         timerRunning = true;
+    }
+
+    private void moveToNextActivity(String gameResult) {
+        Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
+        intent.putExtra(NAME_EXTRA, getIntent().getStringExtra(NAME_EXTRA));
+        intent.putExtra(GAME_RESULT, gameResult);
+        startActivity(intent);
     }
 
     private void updateTimer() {
@@ -132,7 +234,6 @@ public class GameActivity extends AppCompatActivity {
         StringBuffer secondsLeftText;
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
 
-        Log.d("tair", "updateTimer: ");
         secondsLeftText = new StringBuffer();
         if(secondsLeft < 10)
             secondsLeftText.append(0);
@@ -146,5 +247,34 @@ public class GameActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        Log.d("tair", "onClick: ");
+        if(view instanceof JellyfishButton) {
+            view.setVisibility(View.INVISIBLE);
+            score++;
+            progressBar.setProgress(score);
+            updateScore();
+        } else {
+            miss++;
+            missSigns.get(miss-1).setAlpha(1f);
+            if(miss == 3) {
+                manageTime(LOSE);
+                //game over
+            }
+        }
+    }
+
+    private void updateScore() {
+        if(score == 30) {
+            manageTime(WIN);
+            //win
+        }
+//            handler.post(progressRunnable);
+        StringBuffer currentScore = new StringBuffer();
+        currentScore.append(score);
+        scoreTextView.setText(currentScore);
     }
 }
