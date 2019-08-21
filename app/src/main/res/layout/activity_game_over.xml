@@ -4,8 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GameOverActivity"
-    android:background="@drawable/bg_main">
+    tools:context=".GameOverActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#4F009688">
+    </LinearLayout>
 
     <TextView
         android:id="@+id/game_result_text"
@@ -13,15 +18,35 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100sp"
-        android:textSize="70dp" />
+        android:layout_marginTop="80sp"
+        android:textSize="50dp"
+        android:textColor="#F1AC44"/>
+
+    <TextView
+        android:id="@+id/score_and_time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/game_result_text"
+        android:textSize="30dp" />
 
     <Button
+        android:id="@+id/back_to_main_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="back to main page"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20sp"/>
+        android:layout_marginBottom="20sp"
+        android:backgroundTint="#009688"/>
+
+    <Button
+        android:id="@+id/play_again_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="play again"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/back_to_main_button"
+        android:backgroundTint="#009688"/>
 
 </RelativeLayout>

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import whack.ui.JellyfishButton;
+import whack.utils.ScreenDimensions;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,15 +31,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private final int MAX_MISS = 3;
     private final String NAME_EXTRA = "name";
     private final String GAME_RESULT = "result";
+    private final String TIME = "time";
+    private final String SCORE = "score";
     private final String WIN = "win";
     private final String LOSE = "lose";
-    private boolean timerRunning = false;
-    private long timeLeftInMillis = 30000;
-    private long interval = 1000;
-    private int score = 0;
-    private int miss = 0;
+    private boolean timerRunning;
+    private long timeLeftInMillis;
+    private long interval;
+    private int score;
+    private int miss;
 
-    private DisplayMetrics _metrics;
     private CountDownTimer countDownTimer;
     private Handler handler;
     private Runnable jellyfishVisibilityRunnable;
@@ -54,6 +56,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        timerRunning = false;
+        timeLeftInMillis = 31000;
+        interval = 1000;
+        score = 0;
+        miss = 0;
 
         handler = new Handler();
         progressBar = findViewById(R.id.progress);
@@ -116,7 +124,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         for(int i = 0 ; i < COLS * ROWS ; i++) {
             int fraction = COLS;
 //            int screenHeight = screenHeightPixels();
-            int screenWidth = screenWidthPixels();
+            int screenWidth = ScreenDimensions.screenWidthPixels(this);
             int imageWidth = screenWidth / fraction;
 
             RelativeLayout relativeLayout = new RelativeLayout(this);
@@ -173,24 +181,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         return gridLayout;
     }
 
-    public int screenWidthPixels() {
-        return getMetrics().widthPixels;
-    }
-
-//    public int screenHeightPixels() {
-//        return getMetrics().heightPixels;
-//    }
-
-    private DisplayMetrics getMetrics() {
-        if (_metrics == null) {
-            WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-            Display display = wm.getDefaultDisplay();
-            _metrics = new DisplayMetrics();
-            display.getMetrics(_metrics);
-        }
-        return _metrics;
-    }
-
     private void manageTime(String gameResult) {
         if(timerRunning) {
             stopTimer(gameResult);
@@ -223,9 +213,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void moveToNextActivity(String gameResult) {
+        int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
         intent.putExtra(NAME_EXTRA, getIntent().getStringExtra(NAME_EXTRA));
         intent.putExtra(GAME_RESULT, gameResult);
+        intent.putExtra(TIME, (30-secondsLeft));
+        intent.putExtra(SCORE, score);
         startActivity(intent);
     }
 
@@ -261,16 +254,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             miss++;
             missSigns.get(miss-1).setAlpha(1f);
             if(miss == 3) {
-                manageTime(LOSE);
                 //game over
+                manageTime(LOSE);
             }
         }
     }
 
     private void updateScore() {
         if(score == 30) {
-            manageTime(WIN);
             //win
+            manageTime(WIN);
         }
 //            handler.post(progressRunnable);
         StringBuffer currentScore = new StringBuffer();
