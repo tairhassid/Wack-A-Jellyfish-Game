@@ -28,9 +28,11 @@ public class ScreenDimensions {
     private DisplayMetrics getMetrics(Context context) {
         if (_metrics == null) {
             WindowManager wm =(WindowManager) context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-            Display display = wm.getDefaultDisplay();
-            _metrics = new DisplayMetrics();
-            display.getMetrics(_metrics);
+            if (wm != null) {
+                Display display = wm.getDefaultDisplay();
+                _metrics = new DisplayMetrics();
+                display.getMetrics(_metrics);
+            }
         }
         return _metrics;
     }

@@ -38,9 +38,6 @@
             android:textColor="#f16329"
             android:textSize="30sp"
             android:textStyle="bold" />
-        <!--android:layout_toLeftOf="@+id/name_input_text"-->
-        <!--android:layout_marginLeft="50sp"-->
-
 
         <EditText
             android:id="@+id/name_input_text"

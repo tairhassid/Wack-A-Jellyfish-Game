@@ -1,22 +1,18 @@
 package whack.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,30 +22,30 @@ import whack.utils.ScreenDimensions;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final int ROWS = 3;
-    private final int COLS = 3;
-    private final int MAX_MISS = 3;
-    private final String NAME_EXTRA = "name";
-    private final String GAME_RESULT = "result";
-    private final String TIME = "time";
-    private final String SCORE = "score";
-    private final String WIN = "win";
-    private final String LOSE = "lose";
+    private enum Result {Win, Lose}
+
+    private static final int ROWS = 3;
+    private static final int COLS = 3;
+    private static final int MAX_MISS = 3;
+    private static final String NAME_EXTRA = "name";
+    private static final String GAME_RESULT = "result";
+    private static final String TIME = "time";
+    private static final String SCORE = "score";
+
     private boolean timerRunning;
     private long timeLeftInMillis;
     private long interval;
     private int score;
     private int miss;
 
+    private RelativeLayout gameLayout;
     private CountDownTimer countDownTimer;
     private Handler handler;
     private Runnable jellyfishVisibilityRunnable;
     private ArrayList<JellyfishButton> jellyfishImageButtons;
     private ArrayList<ImageView> missSigns;
 
-    private GridLayout missSignsGrid;
     private ProgressBar progressBar;
-    private TextView timerText;
     private TextView scoreTextView;
 
     @Override
@@ -72,7 +68,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         initializeMissSigns();
         updateTimer();
         updateScore();
-        manageTime(LOSE);
+        manageTime(Result.Lose);
     }
 
     private void initializeMissSigns() {
@@ -93,7 +89,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 int numOfButtonsToChange = changeRandom.nextInt(4);
                 for(int i = 0; i < numOfButtonsToChange+1; i++) {
                     int index = changeRandom.nextInt(ROWS*COLS);
-                    JellyfishButton btn = (JellyfishButton) jellyfishImageButtons.get(index);
+                    JellyfishButton btn = jellyfishImageButtons.get(index);
                     btn.setNextRoundChange(1);
                 }
 
@@ -115,27 +111,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void designGridLayout() {
         jellyfishImageButtons = new ArrayList<>();
 
-        RelativeLayout gameLayout = findViewById(R.id.game_layout);
-        GridLayout gridLayout = createGridLayout(COLS, ROWS);
+        gameLayout = findViewById(R.id.game_layout);
+        GridLayout gridLayout = createGridLayout();
         gameLayout.setOnClickListener(this);
 
         gameLayout.addView(gridLayout);
 
         for(int i = 0 ; i < COLS * ROWS ; i++) {
-            int fraction = COLS;
-//            int screenHeight = screenHeightPixels();
             int screenWidth = ScreenDimensions.screenWidthPixels(this);
-            int imageWidth = screenWidth / fraction;
+            int imageWidth = screenWidth / COLS;
 
             RelativeLayout relativeLayout = new RelativeLayout(this);
-            createVortexImage(relativeLayout, gridLayout, imageWidth);
-            createJellyfishImageButton(relativeLayout, gridLayout, imageWidth);
+            createVortexImage(relativeLayout, imageWidth);
+            createJellyfishImageButton(relativeLayout, imageWidth);
 
             gridLayout.addView(relativeLayout);
         }
     }
 
-    private void createVortexImage(RelativeLayout relativeLayout, GridLayout gridLayout, int imageWidth) {
+    private void createVortexImage(RelativeLayout relativeLayout, int imageWidth) {
         RelativeLayout.LayoutParams relParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -149,7 +143,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         relativeLayout.addView(imageView);
     }
 
-    private void createJellyfishImageButton(RelativeLayout relativeLayout, GridLayout gridLayout, int imageWidth) {
+    private void createJellyfishImageButton(RelativeLayout relativeLayout, int imageWidth) {
         RelativeLayout.LayoutParams relParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -168,28 +162,36 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         jellyfishButton.setOnClickListener(this);
     }
 
-    private GridLayout createGridLayout(int cols, int rows) {
+    private GridLayout createGridLayout() {
         RelativeLayout.LayoutParams gridLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         GridLayout gridLayout = new GridLayout(this);
 
         gridLayoutParams.addRule(RelativeLayout.BELOW, R.id.top_layout_game);
 
         gridLayout.setLayoutParams(gridLayoutParams);
-        gridLayout.setColumnCount(cols);
-        gridLayout.setRowCount(rows);
+        gridLayout.setColumnCount(COLS);
+        gridLayout.setRowCount(ROWS);
 
         return gridLayout;
     }
 
-    private void manageTime(String gameResult) {
+    private void manageTime(Result gameResult) {
         if(timerRunning) {
             stopTimer(gameResult);
+            cancelListener();
         } else {
             startTimer();
         }
     }
 
-    private void stopTimer(String gameResult) {
+    private void cancelListener() {
+        for(JellyfishButton btn : jellyfishImageButtons) {
+            btn.setOnClickListener(null);
+        }
+        gameLayout.setOnClickListener(null);
+    }
+
+    private void stopTimer(Result gameResult) {
         countDownTimer.cancel();
         timerRunning = false;
         moveToNextActivity(gameResult);
@@ -205,25 +207,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onFinish() {
-                moveToNextActivity(WIN);
+                moveToNextActivity(Result.Win);
             }
         }.start();
 
         timerRunning = true;
     }
 
-    private void moveToNextActivity(String gameResult) {
+    private void moveToNextActivity(Result gameResult) {
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
         intent.putExtra(NAME_EXTRA, getIntent().getStringExtra(NAME_EXTRA));
-        intent.putExtra(GAME_RESULT, gameResult);
+        intent.putExtra(GAME_RESULT, gameResult.name());
         intent.putExtra(TIME, (30-secondsLeft));
         intent.putExtra(SCORE, score);
         startActivity(intent);
     }
 
     private void updateTimer() {
-        timerText = findViewById(R.id.timer);
+        TextView timerText = findViewById(R.id.timer);
         StringBuffer secondsLeftText;
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
 
@@ -255,7 +257,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             missSigns.get(miss-1).setAlpha(1f);
             if(miss == 3) {
                 //game over
-                manageTime(LOSE);
+                manageTime(Result.Lose);
             }
         }
     }
@@ -263,7 +265,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void updateScore() {
         if(score == 30) {
             //win
-            manageTime(WIN);
+            manageTime(Result.Win);
         }
 //            handler.post(progressRunnable);
         StringBuffer currentScore = new StringBuffer();

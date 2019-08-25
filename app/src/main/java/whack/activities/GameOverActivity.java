@@ -12,20 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import whack.utils.ScreenDimensions;
 
 public class GameOverActivity extends AppCompatActivity {
-    private final double LAYOUT_RELATIVE_SIZE = 0.7;
-    private final String NAME_EXTRA = "name";
-    private final String GAME_RESULT = "result";
-    private final String TIME = "time";
-    private final String SCORE = "score";
-    private final String WIN = "win";
-    private final String LOSE = "lose";
+    private static final double LAYOUT_RELATIVE_SIZE = 0.7;
+    private static final String NAME_EXTRA = "name";
+    private static final String GAME_RESULT = "result";
+    private static final String TIME = "time";
+    private static final String SCORE = "score";
+
     private String playerName;
     private String result;
     private int score;
     private int time;
-
-    private Button mainMenuButton;
-    private Button playAgainButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +35,7 @@ public class GameOverActivity extends AppCompatActivity {
         Log.d("tair", "onCreate: " + playerName);
         WriteMessageToUser();
 
-        mainMenuButton = findViewById(R.id.back_to_main_button);
+        Button mainMenuButton = findViewById(R.id.back_to_main_button);
         mainMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,7 +45,7 @@ public class GameOverActivity extends AppCompatActivity {
             }
         });
 
-        playAgainButton = findViewById(R.id.play_again_button);
+        Button playAgainButton = findViewById(R.id.play_again_button);
         playAgainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,14 +75,14 @@ public class GameOverActivity extends AppCompatActivity {
         TextView resultText = findViewById(R.id.game_result_text);
         TextView scoreAndTimeText = findViewById(R.id.score_and_time_text);
 
-        StringBuffer stringBufferResult = new StringBuffer();
-        stringBufferResult.append(playerName).append("\n").append("You ").append(result + "!");
+        StringBuilder stringBuilderResult = new StringBuilder();
+        stringBuilderResult.append(playerName).append("\n").append("You ").append(result + "!");
 
-        resultText.setText(stringBufferResult.toString());
+        resultText.setText(stringBuilderResult.toString());
 
-        StringBuffer stringBufferScoreTime = new StringBuffer();
-        stringBufferScoreTime.append("Time: ").append(time).append(" Score: ").append(score);
+        StringBuilder stringBuilderScoreTime = new StringBuilder();
+        stringBuilderScoreTime.append("Time: ").append(time).append(" Score: ").append(score);
 
-        scoreAndTimeText.setText(stringBufferScoreTime.toString());
+        scoreAndTimeText.setText(stringBuilderScoreTime.toString());
     }
 }
