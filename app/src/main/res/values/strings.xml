@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">whack-a-jellyfish</string>
     <string name="player_name">Player</string>
+    <string name="logo_image">logo_image</string>
+    <string name="name">Name:</string>
+    <string name="play_image_button">play_image_button</string>
+    <string name="clock_image">clock_image</string>
 </resources>

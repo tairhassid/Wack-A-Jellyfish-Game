@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Random;
 
+import whack.ui.FishButton;
+import whack.ui.GameButton;
 import whack.ui.JellyfishButton;
 import whack.utils.ScreenDimensions;
 
@@ -42,7 +44,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private CountDownTimer countDownTimer;
     private Handler handler;
     private Runnable jellyfishVisibilityRunnable;
-    private ArrayList<JellyfishButton> jellyfishImageButtons;
+    private ArrayList<GameButton> jellyfishImageButtons;
     private ArrayList<ImageView> missSigns;
 
     private ProgressBar progressBar;
@@ -88,18 +90,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 Random changeRandom = new Random();
                 int numOfButtonsToChange = changeRandom.nextInt(4);
                 for(int i = 0; i < numOfButtonsToChange+1; i++) {
-                    int index = changeRandom.nextInt(ROWS*COLS);
-                    JellyfishButton btn = jellyfishImageButtons.get(index);
+                    int index = changeRandom.nextInt(jellyfishImageButtons.size());
+                    Log.d("TAIR", "run: " + i + ") " + "index= " + index);
+                    GameButton btn = jellyfishImageButtons.get(index);
                     btn.setNextRoundChange(1);
                 }
 
                 //show selected jellyfish
-                for(JellyfishButton btn : jellyfishImageButtons) {
+                for(GameButton btn : jellyfishImageButtons) {
                     if(btn.getNextRoundChange() == 1) {
+                        Log.d("TAIR", "run: indexOf" + jellyfishImageButtons.indexOf(btn));
                         btn.setNextRoundChange(0);
                         btn.setVisibility(View.VISIBLE);
                     } else {
-                        btn.setVisibility(View.INVISIBLE);
+                        btn.setVisibility(View.GONE);
                     }
                 }
                 handler.postDelayed(jellyfishVisibilityRunnable, 2000);
@@ -148,18 +152,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
         relParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-        JellyfishButton jellyfishButton = new JellyfishButton(this);
-        jellyfishButton.setBackground(getDrawable(R.drawable.gold_jellyfish));
-        jellyfishButton.setVisibility(View.INVISIBLE);
-
         relParams.width = imageWidth - 200;
         relParams.height = imageWidth - 200;
 
-        jellyfishButton.setLayoutParams(relParams);
-        relativeLayout.addView(jellyfishButton);
+        GameButton jellyfishButton = new JellyfishButton(this);
+        GameButton fishButton = new FishButton(this);
 
-        jellyfishImageButtons.add(jellyfishButton);
-        jellyfishButton.setOnClickListener(this);
+        createButton(relParams, jellyfishButton);
+        createButton(relParams, fishButton);
+
+        relativeLayout.addView(jellyfishButton);
+        relativeLayout.addView(fishButton);
+
+    }
+
+    private void createButton(RelativeLayout.LayoutParams relParams, GameButton gameButton) {
+        gameButton.setBackground(gameButton.getImageDrawable());
+        gameButton.setVisibility(View.GONE);
+
+        gameButton.setLayoutParams(relParams);
+
+        jellyfishImageButtons.add(gameButton);
+        gameButton.setOnClickListener(this);
     }
 
     private GridLayout createGridLayout() {
@@ -185,7 +199,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void cancelListener() {
-        for(JellyfishButton btn : jellyfishImageButtons) {
+        for(GameButton btn : jellyfishImageButtons) {
             btn.setOnClickListener(null);
         }
         gameLayout.setOnClickListener(null);
@@ -248,8 +262,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Log.d("tair", "onClick: ");
         if(view instanceof JellyfishButton) {
-            view.setVisibility(View.INVISIBLE);
+            view.setVisibility(View.GONE);
             score++;
+            progressBar.setProgress(score);
+            updateScore();
+        } else if(view instanceof FishButton) {
+            view.setVisibility(View.GONE);
+            score -= 3;
             progressBar.setProgress(score);
             updateScore();
         } else {

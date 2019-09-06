@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginTop="50sp"
-        android:src="@drawable/logo" />
+        android:src="@drawable/logo"
+        android:contentDescription="@string/logo_image" />
 
     </RelativeLayout>
 
@@ -34,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:text="Name:"
+            android:text="@string/name"
             android:textColor="#f16329"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -70,7 +71,8 @@
             android:layout_width="100sp"
             android:layout_height="100sp"
             android:layout_centerInParent="true"
-            android:background="@drawable/play"/>
+            android:background="@drawable/play"
+            android:contentDescription="@string/play_image_button" />
 
     </RelativeLayout>
 
