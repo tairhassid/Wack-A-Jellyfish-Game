@@ -31,10 +31,10 @@
         android:textSize="30dp" />
 
     <Button
-        android:id="@+id/back_to_main_button"
+        android:id="@+id/top_ten_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="back to main page"
+        android:text="Watch Top 10 Scores"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20sp"
@@ -44,9 +44,18 @@
         android:id="@+id/play_again_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="play again"
+        android:text="Play Again"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/back_to_main_button"
+        android:backgroundTint="#009688"/>
+
+    <Button
+        android:id="@+id/back_to_main_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="back To Main Page"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/top_ten_button"
         android:backgroundTint="#009688"/>
 
 </RelativeLayout>

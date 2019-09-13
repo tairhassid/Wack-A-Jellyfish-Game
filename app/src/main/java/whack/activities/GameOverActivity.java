@@ -54,6 +54,15 @@ public class GameOverActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button topTenButton = findViewById(R.id.top_ten_button);
+        topTenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GameOverActivity.this, TopTenActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setAsPopupWindow() {

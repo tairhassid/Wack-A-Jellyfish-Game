@@ -1,8 +1,10 @@
 <resources>
-    <string name="app_name">whack-a-jellyfish</string>
+    <string name="app_name">Whack A Jellyfish</string>
     <string name="player_name">Player</string>
     <string name="logo_image">logo_image</string>
     <string name="name">Name:</string>
     <string name="play_image_button">play_image_button</string>
     <string name="clock_image">clock_image</string>
+    <string name="top_ten_head">Top 10 Highest Score</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

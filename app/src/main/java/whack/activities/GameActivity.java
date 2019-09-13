@@ -1,5 +1,8 @@
 package whack.activities;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -17,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Random;
 
+import whack.data.DatabaseHelper;
 import whack.ui.FishButton;
 import whack.ui.GameButton;
 import whack.ui.JellyfishButton;
@@ -39,6 +43,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private long interval;
     private int score;
     private int miss;
+    private DatabaseHelper dbHelper;
 
     private RelativeLayout gameLayout;
     private CountDownTimer countDownTimer;
@@ -64,6 +69,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         handler = new Handler();
         progressBar = findViewById(R.id.progress);
         scoreTextView = findViewById(R.id.score);
+        dbHelper = new DatabaseHelper(this);
 
         designGridLayout();
         createRunnableForJellyfish();
@@ -229,6 +235,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void moveToNextActivity(Result gameResult) {
+        dbHelper.put(getIntent().getStringExtra(NAME_EXTRA), score);
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
         intent.putExtra(NAME_EXTRA, getIntent().getStringExtra(NAME_EXTRA));
@@ -259,13 +266,49 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
     public void onClick(View view) {
         Log.d("tair", "onClick: ");
         if(view instanceof JellyfishButton) {
-            view.setVisibility(View.GONE);
             score++;
             progressBar.setProgress(score);
             updateScore();
+
+            final JellyfishButton j = (JellyfishButton) view;
+            ObjectAnimator animator = ObjectAnimator.ofFloat(j, View.ALPHA, 1f, 0f);
+            animator.setDuration(2000);
+            animator.start();
+
+//            view.setVisibility(View.GONE);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    j.setVisibility(View.GONE);
+                    j.setAlpha(1f);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+
+
         } else if(view instanceof FishButton) {
             view.setVisibility(View.GONE);
             score -= 3;
