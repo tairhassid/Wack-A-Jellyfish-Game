@@ -18,8 +18,8 @@
 
         <ImageView
             android:id="@+id/clock"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/clock"
             android:contentDescription="@string/clock_image" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:id="@+id/timer"
             android:textSize="30sp"
-            android:textColor="#f16329"
+            android:textColor="@color/colorDarkOrange"
             android:textStyle="bold"
             android:layout_toRightOf="@+id/clock" />
 
@@ -41,22 +41,22 @@
 
             <ImageView
             android:id="@+id/miss_1"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/x_icon"
             android:alpha="0.2"/>
 
             <ImageView
                 android:id="@+id/miss_2"
-                android:layout_width="40sp"
-                android:layout_height="40sp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/x_icon"
                 android:alpha="0.2"/>
 
             <ImageView
                 android:id="@+id/miss_3"
-                android:layout_width="40sp"
-                android:layout_height="40sp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/x_icon"
                 android:alpha="0.2"/>
         </GridLayout>
@@ -70,8 +70,8 @@
         
         <ProgressBar
             android:id="@+id/progress"
-            android:layout_width="100sp"
-            android:layout_height="20sp"
+            android:layout_width="100dp"
+            android:layout_height="20dp"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_marginTop="10dp"
             android:max="30"/>
@@ -80,10 +80,10 @@
             android:id="@+id/score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#5EF129"
+            android:textColor="@color/colorLightShinyGreen"
             android:textSize="25sp"
             android:layout_toRightOf="@+id/progress"
-            android:layout_marginLeft="5sp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="2dp"/>
 
     </RelativeLayout>

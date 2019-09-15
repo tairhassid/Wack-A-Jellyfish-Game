@@ -18,8 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80sp"
-        android:textSize="50dp"
+        android:layout_marginTop="80dp"
+        android:textSize="50sp"
         android:textColor="#F1AC44"/>
 
     <TextView
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/game_result_text"
-        android:textSize="30dp" />
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/top_ten_button"
@@ -37,7 +37,7 @@
         android:text="Watch Top 10 Scores"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20sp"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="#009688"/>
 
     <Button

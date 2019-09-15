@@ -1,5 +1,7 @@
 package whack.bl;
 
+import android.content.Context;
+
 import whack.data.DatabaseHelper;
 
 public class GameManager {
@@ -24,6 +26,5 @@ public class GameManager {
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
-
 
 }

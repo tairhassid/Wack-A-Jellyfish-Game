@@ -14,14 +14,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import whack.bl.DatabaseManager;
 import whack.bl.GameManager;
 import whack.bl.Player;
-import whack.data.DatabaseHelper;
 import whack.ui.FishButton;
 import whack.ui.GameButton;
 import whack.ui.JellyfishButton;
@@ -30,6 +29,8 @@ import whack.utils.ScreenDimensions;
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "GameActivity";
+    private static final int MAX_NUM_OF_BUTTONS_TO_CHANGE = 6;
+
     private enum Result {Win, Lose}
 
     private static final int ROWS = 3;
@@ -43,7 +44,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private long interval;
     private int score;
     private int miss;
-    private DatabaseHelper dbHelper;
+    private DatabaseManager databaseManager;
 
     private RelativeLayout gameLayout;
     private CountDownTimer countDownTimer;
@@ -72,7 +73,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         handler = new Handler();
         progressBar = findViewById(R.id.progress);
         scoreTextView = findViewById(R.id.score);
-        dbHelper = new DatabaseHelper(this);
+        databaseManager = new DatabaseManager(this);
 
         designGridLayout();
         createRunnableForJellyfish();
@@ -95,9 +96,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         jellyfishVisibilityRunnable = new Runnable() {
             @Override
             public void run() {
-                //random number of jellyfish to show
+                //random number of items to show
                 Random changeRandom = new Random();
-                int numOfButtonsToChange = changeRandom.nextInt(4);
+                int numOfButtonsToChange = changeRandom.nextInt(MAX_NUM_OF_BUTTONS_TO_CHANGE);
                 for(int i = 0; i < numOfButtonsToChange+1; i++) {
                     int index = changeRandom.nextInt(jellyfishImageButtons.size());
                     Log.d("TAIR", "run: " + i + ") " + "index= " + index);
@@ -115,7 +116,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         btn.setVisibility(View.GONE);
                     }
                 }
-                handler.postDelayed(jellyfishVisibilityRunnable, 2000);
+                    handler.postDelayed(jellyfishVisibilityRunnable, 2000);
             }
         };
         jellyfishVisibilityRunnable.run();
@@ -239,12 +240,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void moveToGameOverActivity(Result gameResult) {
         Player player = gameManager.getCurrentPlayer();
-        LatLng loc = player.getGameLocation();
-        String name = player.getName();
 
         player.setScore(score);
 
-        dbHelper.put(name, score, loc.latitude, loc.longitude);
+        databaseManager.savePlayer(player);
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
 
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
@@ -287,34 +286,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             progressBar.setProgress(score);
             updateScore();
 
-            final JellyfishButton j = (JellyfishButton) view;
-            ObjectAnimator animator = ObjectAnimator.ofFloat(j, View.ALPHA, 1f, 0f);
-            animator.setDuration(2000);
-            animator.start();
-
-            animator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    j.setVisibility(View.GONE);
-                    j.setAlpha(1f);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-
+            animateJellyfish(view);
 
         } else if(view instanceof FishButton) {
             view.setVisibility(View.GONE);
@@ -329,6 +301,63 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 manageTime(Result.Lose);
             }
         }
+    }
+
+    private void animateJellyfish(View view) {
+//        final int screenWidth = ScreenDimensions.screenWidthPixels(this);
+
+        final JellyfishButton jellyfishButton = (JellyfishButton) view;
+
+//        float x = jellyfishButton.getX();
+//        final float y = jellyfishButton.getY();
+
+//        Log.d(TAG, "animateJellyfish: " + x + " " + y);
+
+
+        int animationDuration = 1000;
+        ObjectAnimator animatorFade = ObjectAnimator.ofFloat(jellyfishButton, View.ALPHA, 1f, 0f);
+//        ObjectAnimator animatorUp = ObjectAnimator.ofFloat(jellyfishButton, "y", 20f);
+
+        animatorFade.setDuration(animationDuration);
+        animatorFade.start();
+
+//        animatorUp.setDuration(animationDuration);
+//        animatorUp.start();
+
+        animatorFade.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+//                int imageWidth = screenWidth / COLS;
+//                RelativeLayout.LayoutParams params =
+//                        new RelativeLayout.LayoutParams(
+//                                RelativeLayout.LayoutParams.WRAP_CONTENT,
+//                                RelativeLayout.LayoutParams.WRAP_CONTENT);
+                jellyfishButton.setVisibility(View.GONE);
+                jellyfishButton.setAlpha(1f);
+//                params.addRule(RelativeLayout.CENTER_IN_PARENT);
+//                params.topMargin = (int) (y + 20);
+//                params.leftMargin = 100;
+//                params.width = imageWidth - 200;
+//                params.height = imageWidth - 200;
+//                jellyfishButton.setLayoutParams(params);
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
     }
 
     private void updateScore() {

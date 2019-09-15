@@ -57,11 +57,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public Cursor getCursor(String selectQuery) {
+    public Cursor getCursor(int limit) {
         SQLiteDatabase database = this.getReadableDatabase();
-//        String selectQuery = "SELECT * FROM " + TABLE_NAME; // Instead of "SELECT * FROM"
+        String selectQuery = "SELECT * FROM " + TABLE_NAME +
+                " ORDER BY " + COL_SCORE + " DESC LIMIT " + limit;
         Cursor cursor = database.rawQuery(selectQuery, null);
 
         return cursor;
     }
+
+//    public Cursor getCursor(String selectQuery) {
+//        SQLiteDatabase database = this.getReadableDatabase();
+////        String selectQuery = "SELECT * FROM " + TABLE_NAME; // Instead of "SELECT * FROM"
+//        Cursor cursor = database.rawQuery(selectQuery, null);
+//
+//        return cursor;
+//    }
 }

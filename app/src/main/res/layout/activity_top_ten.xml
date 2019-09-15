@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/top_ten_head"
-        android:textColor="#f16329"
+        android:textColor="@color/colorLightGreen"
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
@@ -35,7 +35,8 @@
         <ListView
             android:id="@+id/score_list_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></ListView>
+            android:layout_height="wrap_content"
+            ></ListView>
     </LinearLayout>
 
 </RelativeLayout>

@@ -4,6 +4,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -53,5 +55,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(playerLocation));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(8f));
+//        createBackButton();
     }
+
+//    private void createBackButton() {
+//        View v = findViewById(R.id.map);
+//        ImageButton back = new ImageButton(this);
+//        back.setBackground(this.getDrawable(R.drawable.back));
+//
+//        v.add
+//    }
+
+
 }

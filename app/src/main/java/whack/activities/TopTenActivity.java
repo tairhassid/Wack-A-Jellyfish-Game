@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
+import whack.bl.DatabaseManager;
 import whack.bl.Player;
 import whack.bl.PlayerListAdapter;
 import whack.data.DatabaseHelper;
@@ -22,35 +23,25 @@ import whack.data.DatabaseHelper;
 public class TopTenActivity extends AppCompatActivity {
 
     private static final String TAG = "TopTenActivity";
-    DatabaseHelper db;
+    private DatabaseManager databaseManager;
     private final int numOfRows = 10;
     private ImageButton backImgButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_ten);
 
-        db = new DatabaseHelper(this);
+//        db = new DatabaseHelper(this);
+        databaseManager = new DatabaseManager(this);
         ListView listView = findViewById(R.id.score_list_view);
 
-        ArrayList<Player> players = new ArrayList<>();
-        Cursor data = db.getCursor("SELECT * FROM " + DatabaseHelper.TABLE_NAME +
-                " ORDER BY " + DatabaseHelper.COL_SCORE + " DESC LIMIT " + numOfRows);
+        ArrayList<Player> players = databaseManager.getLimitNumOfPlayers(numOfRows);
 
-        if(data.getCount() == 0) {
-            Toast.makeText(TopTenActivity.this, "empty DB", Toast.LENGTH_LONG).show();
-        } else {
-            while (data.moveToNext()) {
-                Player player = new Player(data.getString(1));
-                player.setScore(data.getInt(2));
-                player.setGameLocation(new LatLng(data.getDouble(3), data.getDouble(4)));
-                players.add(player);
-            }
-
+        if(players != null) {
             ArrayAdapter listAdapter = new PlayerListAdapter(this, R.layout.list_layout, players);
             listView.setAdapter(listAdapter);
-
         }
 
         backImgButton = findViewById(R.id.back_button);

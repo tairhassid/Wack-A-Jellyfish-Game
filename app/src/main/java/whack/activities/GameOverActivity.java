@@ -34,13 +34,14 @@ public class GameOverActivity extends AppCompatActivity {
         setAsPopupWindow();
         initializeVariables();
 
-        WriteMessageToUser();
+        writeMessageToUser();
 
         Button mainMenuButton = findViewById(R.id.back_to_main_button);
         mainMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(GameOverActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
@@ -81,7 +82,7 @@ public class GameOverActivity extends AppCompatActivity {
 
     }
 
-    private void WriteMessageToUser() {
+    private void writeMessageToUser() {
         TextView resultText = findViewById(R.id.game_result_text);
         TextView scoreAndTimeText = findViewById(R.id.score_and_time_text);
 
