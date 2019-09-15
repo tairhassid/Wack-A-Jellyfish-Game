@@ -2,13 +2,14 @@ package whack.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import whack.bl.GameManager;
+import whack.bl.Player;
 import whack.utils.ScreenDimensions;
 
 public class GameOverActivity extends AppCompatActivity {
@@ -18,6 +19,8 @@ public class GameOverActivity extends AppCompatActivity {
     private static final String TIME = "time";
     private static final String SCORE = "score";
 
+    private GameManager gameManager;
+    private Player currentPlayer;
     private String playerName;
     private String result;
     private int score;
@@ -29,10 +32,8 @@ public class GameOverActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_over);
 
         setAsPopupWindow();
-        initializeVariablesFromIntent();
+        initializeVariables();
 
-
-        Log.d("tair", "onCreate: " + playerName);
         WriteMessageToUser();
 
         Button mainMenuButton = findViewById(R.id.back_to_main_button);
@@ -40,7 +41,6 @@ public class GameOverActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(GameOverActivity.this, MainActivity.class);
-                intent.putExtra(NAME_EXTRA, playerName);
                 startActivity(intent);
             }
         });
@@ -50,7 +50,6 @@ public class GameOverActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(GameOverActivity.this, GameActivity.class);
-                intent.putExtra(NAME_EXTRA, playerName);
                 startActivity(intent);
             }
         });
@@ -72,10 +71,12 @@ public class GameOverActivity extends AppCompatActivity {
         getWindow().setLayout((int)(width*LAYOUT_RELATIVE_SIZE), (int)(height*LAYOUT_RELATIVE_SIZE));
     }
 
-    private void initializeVariablesFromIntent() {
-        playerName = getIntent().getStringExtra(NAME_EXTRA);
+    private void initializeVariables() {
+        gameManager = GameManager.getInstance();
+        currentPlayer = gameManager.getCurrentPlayer();
+        playerName = currentPlayer.getName();
         result = getIntent().getStringExtra(GAME_RESULT);
-        score = getIntent().getIntExtra(SCORE, 0);
+        score = currentPlayer.getScore();
         time = getIntent().getIntExtra(TIME, 0);
 
     }

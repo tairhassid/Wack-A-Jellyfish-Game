@@ -2,7 +2,6 @@ package whack.activities;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -14,12 +13,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import whack.bl.GameManager;
+import whack.bl.Player;
 import whack.data.DatabaseHelper;
 import whack.ui.FishButton;
 import whack.ui.GameButton;
@@ -28,15 +29,14 @@ import whack.utils.ScreenDimensions;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "GameActivity";
     private enum Result {Win, Lose}
 
     private static final int ROWS = 3;
     private static final int COLS = 3;
     private static final int MAX_MISS = 3;
-    private static final String NAME_EXTRA = "name";
     private static final String GAME_RESULT = "result";
     private static final String TIME = "time";
-    private static final String SCORE = "score";
 
     private boolean timerRunning;
     private long timeLeftInMillis;
@@ -55,6 +55,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressBar progressBar;
     private TextView scoreTextView;
 
+    private GameManager gameManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +68,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         score = 0;
         miss = 0;
 
+        gameManager = GameManager.getInstance();
         handler = new Handler();
         progressBar = findViewById(R.id.progress);
         scoreTextView = findViewById(R.id.score);
@@ -214,7 +217,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void stopTimer(Result gameResult) {
         countDownTimer.cancel();
         timerRunning = false;
-        moveToNextActivity(gameResult);
+        moveToGameOverActivity(gameResult);
     }
 
     private void startTimer() {
@@ -227,21 +230,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onFinish() {
-                moveToNextActivity(Result.Win);
+                moveToGameOverActivity(Result.Win);
             }
         }.start();
 
         timerRunning = true;
     }
 
-    private void moveToNextActivity(Result gameResult) {
-        dbHelper.put(getIntent().getStringExtra(NAME_EXTRA), score);
+    private void moveToGameOverActivity(Result gameResult) {
+        Player player = gameManager.getCurrentPlayer();
+        LatLng loc = player.getGameLocation();
+        String name = player.getName();
+
+        player.setScore(score);
+
+        dbHelper.put(name, score, loc.latitude, loc.longitude);
         int secondsLeft = (int) (timeLeftInMillis % 60000 / 1000);
+
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
-        intent.putExtra(NAME_EXTRA, getIntent().getStringExtra(NAME_EXTRA));
         intent.putExtra(GAME_RESULT, gameResult.name());
         intent.putExtra(TIME, (30-secondsLeft));
-        intent.putExtra(SCORE, score);
         startActivity(intent);
     }
 
@@ -284,7 +292,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             animator.setDuration(2000);
             animator.start();
 
-//            view.setVisibility(View.GONE);
             animator.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
@@ -329,7 +336,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             //win
             manageTime(Result.Win);
         }
-//            handler.post(progressRunnable);
         StringBuffer currentScore = new StringBuffer();
         currentScore.append(score);
         scoreTextView.setText(currentScore);

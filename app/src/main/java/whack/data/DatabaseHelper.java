@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 
 import whack.activities.R;
 
@@ -15,9 +16,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_NAME = "records_data";
     public static final String COL_PLAYER_NAME = "name";
     public static final String COL_SCORE = "score";
+    public static final String COL_LAT = "latitude";
+    public static final String COL_LNG = "longitude";
 
     private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME +
-            " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_PLAYER_NAME + " TEXT, " + COL_SCORE + " INTEGER)";
+            " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_PLAYER_NAME + " TEXT, " + COL_SCORE + " INTEGER, " +
+            COL_LAT + " DOUBLE, " + COL_LNG + " DOUBLE " + ")";
 
 
     public DatabaseHelper(Context context) {
@@ -34,10 +38,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //TODO
     }
 
-    public long put(String playerName, int score) {
+    public long put(String playerName, int score, double lat, double lng) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_PLAYER_NAME, playerName);
         contentValues.put(COL_SCORE, score);
+        contentValues.put(COL_LAT, lat);
+        contentValues.put(COL_LNG, lng);
 
         return this.put(contentValues);
     }

@@ -7,6 +7,13 @@
     android:background="@drawable/bg_main"
     tools:context=".TopTenActivity">
 
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/back"
+        android:layout_margin="10dp"/>
     <TextView
         android:id="@+id/top_ten_text_view"
         android:layout_width="match_parent"
@@ -15,20 +22,20 @@
         android:textColor="#f16329"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:gravity="center_horizontal"/>
+        android:gravity="center_horizontal"
+        android:layout_below="@id/back_button"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:weightSum="100"
         android:layout_below="@id/top_ten_text_view">
 
-    <ListView
-        android:id="@+id/score_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
-
+        <ListView
+            android:id="@+id/score_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ListView>
     </LinearLayout>
 
 </RelativeLayout>

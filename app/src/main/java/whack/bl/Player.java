@@ -1,9 +1,14 @@
 package whack.bl;
 
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
 public class Player {
 
     private String name;
     private int score;
+    private LatLng gameLocation;
 
     public Player(String name) {
         this.name = name;
@@ -20,6 +25,15 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public LatLng getGameLocation() {
+        return gameLocation;
+    }
+
+    public void setGameLocation(LatLng gameLocation) {
+        this.gameLocation = gameLocation;
+        Log.d("Player", "setGameLocation: " + gameLocation.latitude + " " + gameLocation.longitude);
     }
 
     @Override

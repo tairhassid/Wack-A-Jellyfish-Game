@@ -2,15 +2,16 @@ package whack.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.database.Cursor;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -20,9 +21,10 @@ import whack.data.DatabaseHelper;
 
 public class TopTenActivity extends AppCompatActivity {
 
+    private static final String TAG = "TopTenActivity";
     DatabaseHelper db;
     private final int numOfRows = 10;
-    private ImageButton locationButton;
+    private ImageButton backImgButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class TopTenActivity extends AppCompatActivity {
             while (data.moveToNext()) {
                 Player player = new Player(data.getString(1));
                 player.setScore(data.getInt(2));
+                player.setGameLocation(new LatLng(data.getDouble(3), data.getDouble(4)));
                 players.add(player);
             }
 
@@ -50,19 +53,13 @@ public class TopTenActivity extends AppCompatActivity {
 
         }
 
+        backImgButton = findViewById(R.id.back_button);
+        backImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
     }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        locationButton = findViewById(R.id.location_imageButton);
-//        locationButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(TopTenActivity.this, MapsActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//    }
 }
