@@ -2,21 +2,17 @@ package whack.bl;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-
-import whack.activities.R;
-import whack.activities.TopTenActivity;
 import whack.data.DatabaseHelper;
 
 public class DatabaseManager {
 
-    DatabaseHelper dbHelper;
-    Context context;
+    private DatabaseHelper dbHelper;
+    private Context context;
 
     public DatabaseManager(Context context) {
         this.context = context;
@@ -24,7 +20,16 @@ public class DatabaseManager {
     }
 
     public void savePlayer(Player player) {
-        dbHelper.put(player.getName(), player.getScore(),player.getGameLocation().latitude, player.getGameLocation().longitude);
+        LatLng latLng = player.getGameLocation();
+        double lat, lng;
+        if(latLng == null)
+            lat = lng = 0;
+        else {
+            lat = latLng.latitude;
+            lng = latLng.longitude;
+        }
+
+        dbHelper.put(player.getName(), player.getScore(),lat, lng);
     }
 
     public ArrayList<Player> getLimitNumOfPlayers(int limit) {

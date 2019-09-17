@@ -8,7 +8,6 @@ public class GameManager {
 
     private static GameManager gameManager;
     private Player currentPlayer;
-    private DatabaseHelper dbHelper;
 
     private GameManager() {
     }

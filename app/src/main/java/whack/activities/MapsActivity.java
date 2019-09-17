@@ -4,8 +4,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,26 +43,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-
         playerLocation = getIntent().getParcelableExtra("latLng");
         Log.d(TAG, "onCreate: " + playerLocation.longitude + "  " + playerLocation.latitude);
         mMap.addMarker(new MarkerOptions().position(playerLocation));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(playerLocation));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(8f));
-//        createBackButton();
     }
 
-//    private void createBackButton() {
-//        View v = findViewById(R.id.map);
-//        ImageButton back = new ImageButton(this);
-//        back.setBackground(this.getDrawable(R.drawable.back));
-//
-//        v.add
-//    }
 
 
 }

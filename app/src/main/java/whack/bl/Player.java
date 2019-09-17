@@ -18,7 +18,6 @@ public class Player {
         return score;
     }
 
-
     public void setScore(int score) {
         this.score = score;
     }
@@ -32,8 +31,12 @@ public class Player {
     }
 
     public void setGameLocation(LatLng gameLocation) {
-        this.gameLocation = gameLocation;
-        Log.d("Player", "setGameLocation: " + gameLocation.latitude + " " + gameLocation.longitude);
+        if(gameLocation != null)
+            this.gameLocation = gameLocation;
+        else {
+            this.gameLocation = new LatLng(0, 0);
+        }
+//        Log.d("Player", "setGameLocation: " + gameLocation.latitude + " " + gameLocation.longitude);
     }
 
     @Override

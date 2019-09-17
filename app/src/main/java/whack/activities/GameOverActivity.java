@@ -13,11 +13,9 @@ import whack.bl.Player;
 import whack.utils.ScreenDimensions;
 
 public class GameOverActivity extends AppCompatActivity {
-    private static final double LAYOUT_RELATIVE_SIZE = 0.7;
-    private static final String NAME_EXTRA = "name";
-    private static final String GAME_RESULT = "result";
-    private static final String TIME = "time";
-    private static final String SCORE = "score";
+    public static final double LAYOUT_RELATIVE_SIZE = 0.7;
+    public static final String GAME_RESULT = "result";
+    public static final String TIME = "time";
 
     private GameManager gameManager;
     private Player currentPlayer;

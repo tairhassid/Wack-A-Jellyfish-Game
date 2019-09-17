@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -28,16 +29,17 @@ import whack.utils.ScreenDimensions;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "GameActivity";
-    private static final int MAX_NUM_OF_BUTTONS_TO_CHANGE = 6;
+    public static final int MAX_NUM_OF_BUTTONS_TO_CHANGE = 6;
+    public static final int MIN_NUM_OF_BUTTONS_TO_CHANGE = 3;
 
     private enum Result {Win, Lose}
 
-    private static final int ROWS = 3;
-    private static final int COLS = 3;
-    private static final int MAX_MISS = 3;
-    private static final String GAME_RESULT = "result";
-    private static final String TIME = "time";
+    public static final int ROWS = 4;
+    public static final int COLS = 3;
+    public static final int MAX_MISS = 3;
+    public static final int DELAY_MILLIS = 2000;
+    public static final String GAME_RESULT = "result";
+    public static final String TIME = "time";
 
     private boolean timerRunning;
     private long timeLeftInMillis;
@@ -65,7 +67,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         timerRunning = false;
         timeLeftInMillis = 31000;
-        interval = 1000;
+        interval = DELAY_MILLIS/2;
         score = 0;
         miss = 0;
 
@@ -96,31 +98,49 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         jellyfishVisibilityRunnable = new Runnable() {
             @Override
             public void run() {
-                //random number of items to show
+                selectItemsToShowNextRound();
+
+                changeVisibilityForItems();
+
+                handler.postDelayed(jellyfishVisibilityRunnable, DELAY_MILLIS);
+            }
+
+            private void selectItemsToShowNextRound() {
                 Random changeRandom = new Random();
-                int numOfButtonsToChange = changeRandom.nextInt(MAX_NUM_OF_BUTTONS_TO_CHANGE);
-                for(int i = 0; i < numOfButtonsToChange+1; i++) {
-                    int index = changeRandom.nextInt(jellyfishImageButtons.size());
-                    Log.d("TAIR", "run: " + i + ") " + "index= " + index);
+
+                //random number of items to show between min and max
+                int numOfButtonsToChange = changeRandom.nextInt(
+                        (MAX_NUM_OF_BUTTONS_TO_CHANGE-MIN_NUM_OF_BUTTONS_TO_CHANGE) + 1)
+                        + MIN_NUM_OF_BUTTONS_TO_CHANGE;
+                ArrayList<Integer> indexArray = new ArrayList<>();
+                Log.d("TAIR", "round:\n");
+                for(int i = 0; i <= numOfButtonsToChange; i++) {
+                    int index;
+                    do {
+                        index = changeRandom.nextInt(jellyfishImageButtons.size());
+                        Log.d("TAIR", "selectItemsToShowNextRound: " + index);
+                    } while ((indexArray.contains(index+1) && index%2 == 0) || (indexArray.contains(index-1)) && index%2 == 1);
                     GameButton btn = jellyfishImageButtons.get(index);
+                    indexArray.add(index);
                     btn.setNextRoundChange(1);
                 }
+            }
 
+            private void changeVisibilityForItems() {
                 //show selected jellyfish
                 for(GameButton btn : jellyfishImageButtons) {
                     if(btn.getNextRoundChange() == 1) {
-                        Log.d("TAIR", "run: indexOf" + jellyfishImageButtons.indexOf(btn));
                         btn.setNextRoundChange(0);
                         btn.setVisibility(View.VISIBLE);
                     } else {
                         btn.setVisibility(View.GONE);
                     }
                 }
-                    handler.postDelayed(jellyfishVisibilityRunnable, 2000);
             }
         };
         jellyfishVisibilityRunnable.run();
     }
+
 
     private void designGridLayout() {
         jellyfishImageButtons = new ArrayList<>();
@@ -240,7 +260,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void moveToGameOverActivity(Result gameResult) {
         Player player = gameManager.getCurrentPlayer();
-
         player.setScore(score);
 
         databaseManager.savePlayer(player);
@@ -304,25 +323,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void animateJellyfish(View view) {
-//        final int screenWidth = ScreenDimensions.screenWidthPixels(this);
-
         final JellyfishButton jellyfishButton = (JellyfishButton) view;
-
-//        float x = jellyfishButton.getX();
-//        final float y = jellyfishButton.getY();
-
-//        Log.d(TAG, "animateJellyfish: " + x + " " + y);
-
 
         int animationDuration = 1000;
         ObjectAnimator animatorFade = ObjectAnimator.ofFloat(jellyfishButton, View.ALPHA, 1f, 0f);
-//        ObjectAnimator animatorUp = ObjectAnimator.ofFloat(jellyfishButton, "y", 20f);
 
         animatorFade.setDuration(animationDuration);
         animatorFade.start();
-
-//        animatorUp.setDuration(animationDuration);
-//        animatorUp.start();
 
         animatorFade.addListener(new Animator.AnimatorListener() {
             @Override
@@ -332,20 +339,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onAnimationEnd(Animator animator) {
-//                int imageWidth = screenWidth / COLS;
-//                RelativeLayout.LayoutParams params =
-//                        new RelativeLayout.LayoutParams(
-//                                RelativeLayout.LayoutParams.WRAP_CONTENT,
-//                                RelativeLayout.LayoutParams.WRAP_CONTENT);
                 jellyfishButton.setVisibility(View.GONE);
                 jellyfishButton.setAlpha(1f);
-//                params.addRule(RelativeLayout.CENTER_IN_PARENT);
-//                params.topMargin = (int) (y + 20);
-//                params.leftMargin = 100;
-//                params.width = imageWidth - 200;
-//                params.height = imageWidth - 200;
-//                jellyfishButton.setLayoutParams(params);
-
             }
 
             @Override
