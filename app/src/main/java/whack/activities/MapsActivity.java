@@ -1,9 +1,9 @@
 package whack.activities;
 
-import androidx.fragment.app.FragmentActivity;
-
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,7 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         playerLocation = getIntent().getParcelableExtra("latLng");
-        Log.d(TAG, "onCreate: " + playerLocation.longitude + "  " + playerLocation.latitude);
         mMap.addMarker(new MarkerOptions().position(playerLocation));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(playerLocation));

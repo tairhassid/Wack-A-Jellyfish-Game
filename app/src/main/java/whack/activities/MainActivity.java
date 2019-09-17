@@ -1,14 +1,12 @@
 package whack.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -20,15 +18,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import whack.bl.GameManager;
 import whack.bl.Player;
@@ -45,9 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LatLng latLng;
     private GameManager gameManager;
-    private Location currentLocation;
 
-    private int locationRequestCode = 1000;
     private double wayLatitude = 0.0, wayLongitude = 0.0;
 
     @Override
@@ -73,16 +66,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        Log.d(TAG, "onCreate: ");
-        getLocationPermission();
-//        getLastKnownLocation();
-
-//        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-
-
-//        if (requestedLocationPermission)
-//            getLastKnownLocation();
     }
 
 
@@ -90,13 +73,10 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if (checkMapServices()) {
-            if (requestedLocationPermission) {
-                Log.d(TAG, "onResume: requestedLocationPermission=" + requestedLocationPermission);
-                getLastKnownLocation();
+            if (!requestedLocationPermission) {
+                getLocationPermission();
             } else {
                 Log.d(TAG, "onResume: requestedLocationPermission=" + requestedLocationPermission);
-//                getLocationPermission();
-//                getLastKnownLocation();
             }
         }
     }
@@ -104,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
     //https://www.youtube.com/watch?v=1f4b2-Y_q2A&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=4
     private boolean checkMapServices() {
         if (isGoogleServicesWorking()) {
-//            if (isMapsEnabled()) {
+            if (isMapsEnabled()) {
             return true;
-//            }
+            }
         }
         return false;
     }
@@ -126,46 +106,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    /*Check if GPS is enabled on the device*/
-//    public boolean isMapsEnabled() {
-//        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//
-//        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            buildAlertMessageNoGps();
-//            return false;
-//        }
-//        return true;
-//    }
+    /*Check if GPS is enabled on the device*/
+    public boolean isMapsEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-//    /*Create a dialog that notifies that we need GPS*/
-//    private void buildAlertMessageNoGps() {
-//        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
-//                .setCancelable(false)
-//                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    //if they click "yes" - ask permission for GPS
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        Intent enableGpsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//                        Log.d(TAG, "onClick: yes");
-//                        // to know if the user accepted the permission, onActivityResult is called after
-//                        startActivityForResult(enableGpsIntent, PERMISSION_REQ_ENABLE_GPS);
-//                    }
-//                });
-//        final AlertDialog alert = builder.create();
-//        alert.show();
-//    }
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+            return false;
+        }
+        return true;
+    }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        Log.d(TAG, "onActivityResult: called");
-//        if (requestCode == PERMISSION_REQ_ENABLE_GPS) {
-//            if (!requestedLocationPermission) {
-//                getLocationPermission();
-//            }
-//        }
-//    }
+    /*Create a dialog that notifies that we need GPS*/
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    //if they click "yes" - ask permission for GPS
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent enableGpsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        Log.d(TAG, "onClick: yes");
+                        // to know if the user accepted the permission, onActivityResult is called after
+                        startActivityForResult(enableGpsIntent, PERMISSION_REQ_ENABLE_GPS);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Log.d(TAG, "onActivityResult: called");
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (!requestedLocationPermission) {
+                getLocationPermission();
+            }
+        }
+    }
 
     private void getLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this.getApplicationContext(),

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -113,12 +112,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         (MAX_NUM_OF_BUTTONS_TO_CHANGE-MIN_NUM_OF_BUTTONS_TO_CHANGE) + 1)
                         + MIN_NUM_OF_BUTTONS_TO_CHANGE;
                 ArrayList<Integer> indexArray = new ArrayList<>();
-                Log.d("TAIR", "round:\n");
                 for(int i = 0; i <= numOfButtonsToChange; i++) {
                     int index;
                     do {
                         index = changeRandom.nextInt(jellyfishImageButtons.size());
-                        Log.d("TAIR", "selectItemsToShowNextRound: " + index);
                     } while ((indexArray.contains(index+1) && index%2 == 0) || (indexArray.contains(index-1)) && index%2 == 1);
                     GameButton btn = jellyfishImageButtons.get(index);
                     indexArray.add(index);
@@ -299,7 +296,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        Log.d("tair", "onClick: ");
         if(view instanceof JellyfishButton) {
             score++;
             progressBar.setProgress(score);
